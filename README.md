@@ -7,7 +7,7 @@
   - [x] job, job parameter, job execution 관계 이해하기
 - branch `flow` : Step에 대한 이해 및 처리 흐름 제어
   - [x] spring batch job flow
-  - [ ] BatchStatus vs ExitStatus
+  - [x] BatchStatus vs ExitStatus
 - branch `scope`
 - branch `chunk`
   - [ ] tasklet vs chunk
