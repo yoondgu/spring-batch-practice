@@ -3,10 +3,15 @@
 - [x] Job, Step 만들어보기
 - branch `simple`
   - [x] 10부터 1까지 1초에 한 개의 숫자를 출력하는 배치 코드 작성해보기
-    - [ ] tasklet vs chunk
-    - [ ] 병렬 처리
+  - [x] job, job parameter, job execution 관계 이해하기
+- branch 'flow'
+  - [ ] spring batch job flow 
+  - [ ] tasklet vs chunk
+  - [ ] 병렬 처리
 - [ ] DB 통신하는 작업의 배치 코드 작성해보기
 - [ ] 어플리케이션을 띄워두고, 특정 상황에 배치가 수행되게 해보기
+
+> 실습 참고 자료: https://github.com/jojoldu/spring-batch-in-action  
 
 # 학습 내용
 
