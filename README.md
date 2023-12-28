@@ -1,10 +1,11 @@
 # 학습 목표
+배치 어플리케이션과 이를 이루는 요소들을 이해하고, 직접 배치 어플리케이션 코드를 작성하는 방법을 익힌다.  
 - [x] Spring boot batch 프로젝트 생성, 의존성 설정
 - [x] Job, Step 만들어보기
-- branch `simple`
+- branch `simple` : Batch와 Job에 대한 기본 이해
   - [x] 10부터 1까지 1초에 한 개의 숫자를 출력하는 배치 코드 작성해보기
   - [x] job, job parameter, job execution 관계 이해하기
-- branch 'flow'
+- branch `flow` : Step에 대한 이해 및 처리 흐름 제어
   - [ ] spring batch job flow 
   - [ ] tasklet vs chunk
   - [ ] 병렬 처리
@@ -22,6 +23,9 @@
 - 최적화 및 파티셔닝 기술을 통해 대용량, 고성능 배치 작업을 가능하게 하는 기능도 제공한다.
 - 따라서 단순한 배치 작업 뿐만 아니라 복잡한 대용량 배치 작업의 처리가 가능하다.
 - Spring Boot는 `spring-boot-starter-batch` 의존성을 제공한다.
+> 배치 어플리케이션은, 단발성의 대용량 데이터 처리 역할을 위한 어플리케이션이다.  
+> Spring MVC는 개발자가 비즈니스 로직에 최대한 집중할 수 있게 해준다.  
+> 이와 마찬가지로 Spring Batch는 배치 어플리케이션을 지원하는 프레임워크인 것이다. 
 
 ### Spring Boot: Job 실행하기
   - 어플리케이션 시작 시 application context에 하나의 Job이 발견되면, 'startup' 시점에 해당 Job이 실행된다.
