@@ -6,9 +6,12 @@
   - [x] 10부터 1까지 1초에 한 개의 숫자를 출력하는 배치 코드 작성해보기
   - [x] job, job parameter, job execution 관계 이해하기
 - branch `flow` : Step에 대한 이해 및 처리 흐름 제어
-  - [ ] spring batch job flow 
+  - [x] spring batch job flow
+  - [ ] BatchStatus vs ExitStatus
+- branch `scope`
+- branch `chunk`
   - [ ] tasklet vs chunk
-  - [ ] 병렬 처리
+- [ ] 병렬 처리
 - [ ] DB 통신하는 작업의 배치 코드 작성해보기
 - [ ] 어플리케이션을 띄워두고, 특정 상황에 배치가 수행되게 해보기
 
@@ -107,3 +110,17 @@
 
 > 참고 링크: https://docs.spring.io/spring-batch/reference/domain.html
 
+## Spring Batch Job Flow
+실제로 Batch 작업의 플로우는 어떻게 작성할까? Step을 관리하는 키워드로 아래와 같은 것들이 있다.  
+
+1. Next
+2. 조건 별 흐름 제어 (Flow. on, to, from, end와 같은 메서드를 활용)
+3. Decide
+
+### BatchStatus vs ExitStatus
+- BatchStatus
+  - Job 또는 Step의 실행 결과를 Spring에서 기록할 때 사용하는 Enum
+- ExitStatus
+  - Step의 실행 후 상태로, **Enum이 아님**
+  - Spring Batch는 기본적으로 ExitStatus의 exitCode를 BatchStatus와 같도록 설정해두었음.
+  - **하지만, 본인만의 커스텀한 exitCode가 필요하다면 이를 반환하는 별도의 로직을 작성하면 됨**
