@@ -1,9 +1,10 @@
 spring:
   profiles:
     active: local
+      # 어떤 배치도 실행하지 않겠다는 뜻. 이 상태에서 Program arguments에 job.name을 인수로 전달하여 원하는 배치만 실행한다.
   batch:
     job:
-      name: simpleJob
+      name: ${job.name:NONE}
 ---
 spring:
   datasource:
