@@ -9,13 +9,16 @@
   - [x] spring batch job flow
   - [x] BatchStatus vs ExitStatus
 - branch `scope`: Spring Batch의 Bean scope에 대해 학습하기
-- branch `chunk`
-  - [ ] tasklet vs chunk
+- branch `chunk`: Chunk 지향 처리에 대한 의미, 데이터 처리 요소 이해하기
+  - [x] tasklet vs chunk
+  - [ ] ItemReader
+  - [ ] ItemProcessor
+  - [ ] ItemWriter
 - [ ] 병렬 처리
 - [ ] DB 통신하는 작업의 배치 코드 작성해보기
 - [ ] 어플리케이션을 띄워두고, 특정 상황에 배치가 수행되게 해보기
 
-> 실습 참고 자료: https://github.com/jojoldu/spring-batch-in-action  
+> 참고 자료: https://github.com/jojoldu/spring-batch-in-action  
 
 # 학습 내용
 
@@ -147,3 +150,34 @@
 > **주의 사항**  
 > `@Bean` + `@StepScope` == `@Scope (value = "step", proxyMode = TARGET_CLASS)`이다.  
 > 이 때 proxyMode로 인해 문제가 발생할 수 있다.
+  
+  
+## Chunk 지향 처리
+- Spring Batch는 Chunk 지향 처리를 한다.
+- Spring Batch에서의 Chunk란, 데이터 덩어리로 작업할 때 각 커밋 사이에 처리되는 row 수를 의미함.
+- 즉, **한 번에 하나씩 데이터를 읽어 Chunk라는 덩어리를 만든 뒤, Chunk 단위로 트랜잭션을 다루는 것.**
+  - Reader와 Processor에서는 1건씩 다뤄지고, Writer에서는 Chunk 단위로 처리한다.
+- **Tasklet 중 `ChunkOrientedTasklet` 클래스를 통해 Chunk를 처리한다.**
+
+> `ChunkOrientedTasklet` 클래스에서 Chunk 지향 처리의 전체 로직을 확인할 수 있다.  
+> `ChunkProcessor` 인터페이스의 기본 구현체인 `SimpleChunkProcessor` 클래스에서 Processor와 Writer 로직을 확인할 수 있다.  
+
+### Tasklet vs Chunk
+- Chunk 지향 처리 또한 Tasklet의 구현체로 이루어지며, 이를 구성하는 3요소가 ItemReader/Writer/Processor인 것이므로 **대척되는 개념은 아니다.**
+- Tasklet은 `execute` 단일 메서드를 제공하는 인터페이스이다.
+  - Step이 중지될 떄까지 해당 메서드가 계속 반복해서 수행된다.
+- 따라서 이를 직접 구현하여 처리 로직을 작성할 수도 있고, `ChunkOrientedTasklet`를 사용하여 Chunk 처리를 할 수도 있는 것이다.
+  - 데이터의 양이 적고 배치 처리 과정이 쉬운 경우 간단하게 Tasklet을 작성하여 처리할 수 있다.
+  - 대용량 데이터를 처리하는 경우 트랜잭션 단위를 작게 처리할 수 있는 Chunk 지향 프로세스를 이용한다.
+
+### Page Size vs Chunk Size
+- `PagingItemReader`도 많이 사용되는데, Page Size와 Chunk Size는 서로 의미하는 바가 다르다.
+  - Page Size: 한 번에 조회할 Item의 양
+  - Chunk Size: 한 번에 처리될 트랜잭션 단위
+- Page Size가 10이고 Chunk Size가 50이면?
+  - Page 조회가 5번 일어나면 1번의 트랜잭션이 발생하여 Chunk가 처리된다.
+  - 50 만큼의 데이터를 5번의 Page 조회로 읽고, Chunk로 모아 처리함
+  > 이 경우 한 번의 트랜잭션 처리를 위해 5번의 쿼리 조회가 발생하여 성능 상 이슈가 발생할 수 있다.    
+  > 성능샹 이슈 외에도, JPA 영속성 컨텍스트가 깨지는 문제도 발생한다.  
+  > **따라서 서로 다른 의미의 값이더라도 2개의 값을 일치하는 것이 보편적으로 좋다.** 
+  
