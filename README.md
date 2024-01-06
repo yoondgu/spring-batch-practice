@@ -11,11 +11,9 @@
 - branch `scope`: Spring Batch의 Bean scope에 대해 학습하기
 - branch `chunk`: Chunk 지향 처리에 대한 의미, 데이터 처리 요소 이해하기
   - [x] tasklet vs chunk
-  - [ ] ItemReader
-  - [ ] ItemProcessor
-  - [ ] ItemWriter
+  - [x] 데이터 처리 요소: ItemReader, ItemProcessor, ItemWriter
+  - [ ] DB 통신하는 작업의 배치 코드 작성해보기
 - [ ] 병렬 처리
-- [ ] DB 통신하는 작업의 배치 코드 작성해보기
 - [ ] 어플리케이션을 띄워두고, 특정 상황에 배치가 수행되게 해보기
 
 > 참고 자료: https://github.com/jojoldu/spring-batch-in-action  
@@ -180,4 +178,32 @@
   > 이 경우 한 번의 트랜잭션 처리를 위해 5번의 쿼리 조회가 발생하여 성능 상 이슈가 발생할 수 있다.    
   > 성능샹 이슈 외에도, JPA 영속성 컨텍스트가 깨지는 문제도 발생한다.  
   > **따라서 서로 다른 의미의 값이더라도 2개의 값을 일치하는 것이 보편적으로 좋다.** 
-  
+
+
+## Chunk 데이터 처리 요소
+- Chunk 처리를 구성하는 3 요소로 ItemReader, ItemWriter, ItemProcessor 3가지가 있다.
+  - `ChunkOrientedTasklet`가 이 셋을 관리한다.
+  - Reader, Writer는 필수, Processor는 선택 요소이다.
+
+### ItemReader
+- 데이터를 읽어들인다. 이 때 각 항목을 개별적으로 읽고, Processor에 전달한다.
+  - `read()` 메서드는 Item 하나를 반환한다.
+- DB 데이터 뿐만 아니라 다른 데이터 소스를 입력으로 사용할 수 있다. (File, XML, JSON 등)
+- 읽어올 수 있는 데이터 유형은 아래와 같다.
+  - 입력 데이터에서 읽어오기
+  - 파일에서 읽어오기
+  - Database에서 읽어오기
+  - Java Message Service등 다른 소스에서 읽어오기
+  - 본인만의 커스텀한 Reader로 읽어오기
+
+### ItemWriter
+- Writer는 Reader, Processor를 거쳐 Chunk 단위만큼 쌓인 복수의 Item을 일괄 처리한다.
+  - `write()` 메서드는 인자로 Item List를 받는다.
+- Spring Batch는 다양한 Output 타입을 처리하는, 많은 Writer를 제공하며 커스텀으로 구현할 수도 있다.
+
+### ItemProcessor
+- Reader에서 넘겨준 데이터 개별건을 가공/처리한다.
+- 비즈니스 로직을 작성하기에 적합하다.
+- 일반적으로 변환 또는 필터의 용도로 사용한다.
+  - 변환: 데이터를 원하는 타입으로 변환해서 Writer에 넘겨준다.
+  - 필터: 데이터를 Writer로 넘겨줄 것인지 결정한다. (`null`을 반환하면 전달되지 않음)
