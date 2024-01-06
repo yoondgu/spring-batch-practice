@@ -8,7 +8,7 @@
 - branch `flow` : Step에 대한 이해 및 처리 흐름 제어
   - [x] spring batch job flow
   - [x] BatchStatus vs ExitStatus
-- branch `scope`
+- branch `scope`: Spring Batch의 Bean scope에 대해 학습하기
 - branch `chunk`
   - [ ] tasklet vs chunk
 - [ ] 병렬 처리
@@ -124,3 +124,26 @@
   - Step의 실행 후 상태로, **Enum이 아님**
   - Spring Batch는 기본적으로 ExitStatus의 exitCode를 BatchStatus와 같도록 설정해두었음.
   - **하지만, 본인만의 커스텀한 exitCode가 필요하다면 이를 반환하는 별도의 로직을 작성하면 됨**
+
+## Spring Batch Scope & Job Parameter
+### JobParameter 사용법
+- Spring Batch에서 Job Parameter를 사용하기 위해서는 Spring Batch 전용 Scope를 선언해야 한다.
+- 빈 등록을 할 때, 파라미터에서 아래와 같이 어노테이션 내 SpEL로 선언해서 사용한다.
+  ```java
+  @Value("#{jobParameters[파라미터명]}")
+  ```
+> **왜 JobParameter를 사용할까?**    
+> 시스템 변수(스프링 내 변수 포함)를 사용할 경우,  
+> 1. JobParameter 관련 기능을 쓸 수 없다.  
+> 그래서 같은 JobParameter로 같은 Job을 두 번 실행하게 될 수 있으며, Parameter 관련 메타테이블을 관리할 수 없다.    
+> 2. 전역 상태인 변수를 동적으로 계속해서 변경시킬 수 있어야 한다. + Late Binding을 할 수 없다.  
+  
+### JobScope, StepScope
+- `@JobScope`는 Step 선언문에서, `@StepScope`는 Tasklet, ItemReader, ItemWriter, ItemProcessor에서 사용할 수 있다.
+- `@JobScope`, `@StepScope`는 Job 실행 시점 / Step 실행 시점에 빈을 생성/삭제한다.
+  - Late Binding -> 비즈니스 로직 처리 단계에서 할당 가능
+  - 동일한 컴포넌트의 동시성 문제 해결 : 각 Step에서 별도의 Tasklet을 생성, 관리함
+
+> **주의 사항**  
+> `@Bean` + `@StepScope` == `@Scope (value = "step", proxyMode = TARGET_CLASS)`이다.  
+> 이 때 proxyMode로 인해 문제가 발생할 수 있다.
